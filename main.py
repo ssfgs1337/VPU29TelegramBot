@@ -1,12 +1,12 @@
 import logging
 
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder
 
 from config.config import TELEGRAM_TOKEN
-from handlers.contact_handler import contact
-from handlers.hello_handler import hello
-from handlers.location_handler import location
-from handlers.start_handler import start
+from handlers.contact_handler import ContactHandler
+from handlers.hello_handler import HelloHandler
+from handlers.location_handler import LocationHandler
+from handlers.start_handler import StartHandler
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -14,18 +14,11 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
-    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
-    start_handler = CommandHandler('start', start)
-    application.add_handler(start_handler)
+    StartHandler.register(app)
+    ContactHandler.register(app)
+    HelloHandler.register(app)
+    LocationHandler.register(app)
 
-    hello_handler = CommandHandler('hello', hello)
-    application.add_handler(hello_handler)
-
-    location_handler = MessageHandler(filters.LOCATION, location)
-    application.add_handler(location_handler)
-
-    contact_handler = MessageHandler(filters.CONTACT, contact)
-    application.add_handler(contact_handler)
-
-    application.run_polling()
+    app.run_polling()
