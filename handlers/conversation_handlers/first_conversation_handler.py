@@ -1,9 +1,10 @@
-from telegram import Update
-from telegram.ext import ConversationHandler, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ConversationHandler, CommandHandler, ContextTypes, MessageHandler, filters, \
+    CallbackQueryHandler
 
 from handlers.base_handler import BaseHandler
 
-GENDER, PHOTO = range(4)
+GENDER, PHOTO, AGE = range(3)
 
 
 class FirstConversationHandler(BaseHandler):
@@ -14,6 +15,7 @@ class FirstConversationHandler(BaseHandler):
             states={
                 GENDER: [MessageHandler(filters.Regex('^(Boy|Girl)$'), cls.gender)],
                 PHOTO: [MessageHandler(filters.PHOTO, cls.photo)],
+                AGE: [CallbackQueryHandler(cls.age)],
             },
             fallbacks=[CommandHandler('exit', cls.exit)]
         )
@@ -40,6 +42,28 @@ class FirstConversationHandler(BaseHandler):
 
     @staticmethod
     async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(f'Thank you for your photo!')
+        """Sends a message with three inline buttons attached."""
+        keyboard = [
+            [
+                InlineKeyboardButton(f"{i}", callback_data=f"{i}") for i in range(5)
+            ],
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await update.message.reply_text("Thank you for your photo! How old are you?", reply_markup=reply_markup)
+
+        return AGE
+
+    @staticmethod
+    async def age(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Parses the CallbackQuery and updates the message text."""
+        query = update.callback_query
+
+        # CallbackQueries need to be answered, even if no notification to the user is needed
+        # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+        await query.answer()
+
+        await query.edit_message_text(text=f"Your age is: {query.data}")
 
         return ConversationHandler.END
