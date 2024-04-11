@@ -1,0 +1,5 @@
+from handlers.command_handlers.hello_handler import HelloHandler
+from handlers.command_handlers.start_handler import StartHandler
+from handlers.message_handlers.contact_handler import ContactHandler
+from handlers.message_handlers.location_handler import LocationHandler
+from handlers.message_handlers.location_handler import BaseHandler
