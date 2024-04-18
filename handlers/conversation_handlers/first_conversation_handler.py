@@ -36,19 +36,28 @@ class FirstConversationHandler(BaseHandler):
 
     @staticmethod
     async def gender(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(f'You are a {update.message.text}. Share your photo, please!')
+        gender = update.message.text # Boy or Girl
+
+        context.user_data['gender'] = gender
+
+        await update.message.reply_text(f'You are a {gender}. Share your photo, please!')
 
         return PHOTO
 
     @staticmethod
     async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Sends a message with three inline buttons attached."""
-        keyboard = [
-            [
-                InlineKeyboardButton(f"{i}", callback_data=f"{i}") for i in range(5)
-            ],
-        ]
+        keyboard = []
+        number = 1
 
+        for i in range(10):
+            row = []
+
+            for j in range(5):
+                row.append(InlineKeyboardButton(f"{number}", callback_data=f"{number}"))
+                number += 1
+
+            keyboard.append(row)
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         await update.message.reply_text("Thank you for your photo! How old are you?", reply_markup=reply_markup)
@@ -64,6 +73,10 @@ class FirstConversationHandler(BaseHandler):
         # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
         await query.answer()
 
-        await query.edit_message_text(text=f"Your age is: {query.data}")
+        age = query.data
+
+        context.user_data['age'] = age
+
+        await query.edit_message_text(text=f"You are a {context.user_data['gender']}. Your age is: {context.user_data['age']}")
 
         return ConversationHandler.END
