@@ -1,4 +1,5 @@
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, CommandHandler
 
 from handlers.base_handler import BaseHandler
@@ -20,6 +21,7 @@ class StartHandler(BaseHandler):
 
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="I'm a bot, please talk to me!",
-            reply_markup=reply_markup
+            text="I'm a *bot*, please talk to me!",
+            reply_markup=reply_markup,
+            parse_mode=ParseMode.MARKDOWN_V2
         )
